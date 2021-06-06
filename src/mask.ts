@@ -1,74 +1,43 @@
 import { AnnotatedPrediction } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh";
-import {
-  Coord2D,
-  Coords3D,
-} from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh/util";
+import { Coords3D } from "@tensorflow-models/face-landmarks-detection/dist/mediapipe-facemesh/util";
 
 const drawMask = (
   ctx: CanvasRenderingContext2D,
   keypoints: Coords3D,
-  distance: number
 ) => {
-  const points = [
-    93,
-    132,
-    58,
-    172,
-    136,
-    150,
-    149,
-    176,
-    148,
-    152,
-    377,
-    400,
-    378,
-    379,
-    365,
-    397,
-    288,
-    361,
-    323,
-  ];
+  const reversePoints = keypoints.map(point=> {
+    return [480-point[0], point[1], point[2]]
+  })
+  const lips = [61,185,40,39,37,0,267,269,270,409,291,306,292,308,415,310,311,312,13,82,81,80,191,78,62,76,61]
+  const lowerLips = [61,146,91,181,84,17,314,405,321,375,291,306,308,324,318,402,317,14,87,178,88,95,78,62,76,61]
+  for (let i = 0; i < lips.length; i++) {
+    ctx.lineTo(
+      reversePoints[lips[i]][0],
+      reversePoints[lips[i]][1]
+    );
+  }
 
-  ctx.moveTo(keypoints[195][0], keypoints[195][1]);
-  for (let i = 0; i < points.length; i++) {
-    if (i < points.length / 2) {
-      ctx.lineTo(
-        keypoints[points[i]][0] - distance,
-        keypoints[points[i]][1] + distance
-      );
-    } else {
-      ctx.lineTo(
-        keypoints[points[i]][0] + distance,
-        keypoints[points[i]][1] + distance
-      );
-    }
+  for (let i = 0; i < lowerLips.length; i++) {
+    ctx.lineTo(
+      reversePoints[lowerLips[i]][0],
+      reversePoints[lowerLips[i]][1]
+    );
   }
 };
 
 export const draw = (
   predictions: AnnotatedPrediction[],
   ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number
+  lipColor: string
 ) => {
   if (predictions.length > 0) {
     predictions.forEach((prediction: AnnotatedPrediction) => {
       const keypoints = prediction.scaledMesh;
-      const boundingBox = prediction.boundingBox;
-      const bottomRight = boundingBox.bottomRight as Coord2D;
-      const topLeft = boundingBox.topLeft as Coord2D;
-      const distance =
-        Math.sqrt(
-          Math.pow(bottomRight[0] - topLeft[0], 2) +
-            Math.pow(topLeft[1] - topLeft[1], 2)
-        ) * 0.02;
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "black";
+      ctx.clearRect(0, 0, 480, 480);
+      ctx.fillStyle = lipColor;
       ctx.save();
       ctx.beginPath();
-      drawMask(ctx, keypoints as Coords3D, distance);
+      drawMask(ctx, keypoints as Coords3D);
       ctx.closePath();
       ctx.fill();
       ctx.restore();

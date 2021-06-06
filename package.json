@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@tensorflow-models/face-landmarks-detection": "^0.0.3",
+    "@tensorflow/tfjs-backend-wasm": "^3.7.0",
     "@tensorflow/tfjs-backend-webgl": "^3.6.0",
     "@tensorflow/tfjs-converter": "^3.6.0",
     "@tensorflow/tfjs-core": "^3.6.0",
@@ -25,6 +26,8 @@
     "yarn": "^1.22.10"
   },
   "scripts": {
+    "wasm": "cp node_modules/@tensorflow/tfjs-backend-wasm/dist/tfjs-backend-wasm.wasm ./public",
+    "winwasm": "PowerShell -Command cp node_modules/@tensorflow/tfjs-backend-wasm/dist/tfjs-backend-wasm.wasm ./public -Force",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
